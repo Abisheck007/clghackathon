@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Image</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1f2937;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        #video, #canvas {
+            width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        #capture {
+            background: #ff7e5f;
+            background-image: linear-gradient(to right, #feb47b, #ff7e5f);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        #capture:hover {
+            transform: translateY(-2px);
+            background-image: linear-gradient(to right, #ff7e5f, #feb47b);
+        }
+
+        /* Form styles */
+        #upload-form {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #upload-form input[type="text"] {
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+            color: #333;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #upload-form button[type="submit"] {
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            background: #43cea2;
+            background-image: linear-gradient(to right, #185a9d, #43cea2);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        #upload-form button[type="submit"]:hover {
+            transform: translateY(-2px);
+            background-image: linear-gradient(to right, #43cea2, #185a9d);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            #capture {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            #capture {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+
+            #upload-form input[type="text"], #upload-form button[type="submit"] {
+                font-size: 0.9rem;
+                padding: 8px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Capture Your Image</h1>
+        <video id="video" autoplay></video>
+        <canvas id="canvas"></canvas>
+        <button id="capture">Capture</button>
+
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="image_data" id="image_data">
+            <input type="text" name="image_name" placeholder="Enter image name" required>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+
+    <script>
+        // Access the webcam and stream video to the video element
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                document.getElementById('video').srcObject = stream;
+            });
+
+        document.getElementById('capture').addEventListener('click', function() {
+            const canvas = document.getElementById('canvas');
+            const video = document.getElementById('video');
+            const context = canvas.getContext('2d');
+            
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert the canvas image to a data URL
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Set the image data to the hidden input field
+            document.getElementById('image_data').value = imageData;
+            
+            // Show the upload form
+            document.getElementById('upload-form').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
